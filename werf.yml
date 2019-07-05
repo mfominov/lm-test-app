@@ -74,6 +74,8 @@ git:
     stageDependencies:
       install:
       - "composer.lock"
+      setup:
+      - "src/generator.php"
 
 ---
 image: frontend
