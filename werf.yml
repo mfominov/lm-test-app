@@ -1,0 +1,92 @@
+project: my-project
+configVersion: 1
+
+{{ $PHPVersion := "7.2" }}
+{{ $NginxVersion := "1.17.1-alpine" }}
+---
+image: backend
+from: php:{{ $PHPVersion}}
+ansible:
+  beforeInstall:
+    - name: "Create non-root main application user"
+      user:
+        name: app
+        comment: "Non-root main application user"
+        uid: 7000
+        shell: /bin/bash
+        home: /app
+    - name: Install essential utils
+      apt:
+        name: "{{`{{ packages }}`}}"
+        update_cache: yes
+      vars:
+        packages:
+        - apt-transport-https
+        - openssh-client
+        - git
+        - imagemagick
+    - file:
+        path: /root/.ssh
+        state: directory
+        owner: root
+        group: root
+        recurse: yes
+    - name: "Setup ssh known_hosts used in Gemfile"
+      shell: |
+        set -e
+        ssh-keyscan github.com >> /root/.ssh/known_hosts
+      args:
+        executable: /bin/bash
+  install:
+  - name: "Install build dependencies"
+    shell: |
+      set -e
+      echo composer install
+    args:
+      executable: /bin/bash
+      chdir: /app
+    become: true
+    become_user: app
+  beforeSetup:
+  - name: "Compile assets"
+    shell: |
+      set -e
+      echo composer run-script compile-assets
+    args:
+      executable: /bin/bash
+      chdir: /app
+    become: true
+    become_user: app
+  setup:
+  - name: "Create html file"
+    shell: |
+      php generator.php > index.html
+    args:
+      executable: /bin/bash
+      chdir: /app
+    become: true
+    become_user: app
+git:
+  - add: /src
+    to: /app
+    owner: app
+    group: app
+    stageDependencies:
+      install:
+      - "composer.lock"
+
+---
+
+artifact: php-site
+fromImage: backend
+
+---
+image: frontend
+from: nginx:{{ $NginxVersion}}
+import:
+- artifact: php-site
+  after: setup
+  add: /app/index.html
+  to: /usr/share/nginx/html
+  owner: 101
+  group: 101
