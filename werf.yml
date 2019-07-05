@@ -1,11 +1,11 @@
 project: my-project
 configVersion: 1
 
-{{ $PHPVersion := "7.2" }}
-{{ $NginxVersion := "1.17.1-alpine" }}
+{{ $_ := set . "PHPVersion" "7.2" }}
+{{ $_ := set . "NginxVersion" "1.17.1-alpine" }}
 ---
 artifact: php-site
-from: php:{{ $PHPVersion}}
+from: php:{{ .PHPVersion}}
 ansible:
   beforeInstall:
     - name: "Create non-root main application user"
@@ -79,7 +79,7 @@ git:
 
 ---
 image: frontend
-from: nginx:{{ $NginxVersion}}
+from: nginx:{{ .NginxVersion}}
 import:
 - artifact: php-site
   after: setup
