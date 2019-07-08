@@ -6,5 +6,5 @@
 
 
     werf build-and-publish --stages-storage :local --images-repo nexus.lm-edu.flant.ru/hv6 --tag-custom=1.0.0
-    werf deploy --env dev --stages-storage :local --images-repo nexus.lm-edu.flant.ru/hv6 --tag-custom=1.0.0 --env prod
+    werf deploy --env dev --stages-storage :local --images-repo nexus.lm-edu.flant.ru/hv6 --tag-custom=1.0.0
 ```
