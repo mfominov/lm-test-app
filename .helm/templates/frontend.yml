@@ -1,0 +1,24 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    component: {{ .Chart.Name }}
+spec:
+  replicas: {{ pluck .Values.global.env .Values.replicas.api | first | default .Values.replicas.api._default }}
+  selector:
+    matchLabels:
+      component: {{ .Chart.Name }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        component: {{ .Chart.Name }}
+    spec:
+      containers:
+      - name: nginx
+{{ tuple "mfominov-project" . | include "dapp_container_image" | indent 8 }}

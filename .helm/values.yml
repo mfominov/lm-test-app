@@ -1,0 +1,5 @@
+replicas:
+  api:
+    stage: 2
+    prod: 2
+    _default: 1

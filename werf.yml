@@ -1,4 +1,4 @@
-project: my-project
+project: mfominov-project
 configVersion: 1
 
 {{ $_ := set . "PHPVersion" "7.2" }}
