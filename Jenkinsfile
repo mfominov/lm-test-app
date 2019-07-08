@@ -18,7 +18,6 @@ def git_repo() {
     return readFile(".git/remote-url").trim()
 }
 
-
 def git_commit() {
   sh "git rev-parse HEAD > .git/commit"
   return readFile(".git/commit").trim()
