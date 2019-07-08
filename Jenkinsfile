@@ -30,7 +30,9 @@ def git_branch() {
 }
 
 def DOCKER_REGISTRY = "nexus.lm-edu.flant.ru"
+def DOCKER_REGISTRY_CREDENTIALS = "DOCKER_REGISTRY"
 def HV = "hv6"
+def kubecfg_file_name = "hv-6-kubecfg"
 
 node ('mfominov') {
     timestamps {
@@ -39,7 +41,7 @@ node ('mfominov') {
             checkout scm
         }
         stage('werf build') {
-            withCredentials([usernamePassword(credentialsId: 'DOCKER_REGISTRY', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+            withCredentials([usernamePassword(credentialsId: "${DOCKER_REGISTRY_CREDENTIALS}", passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                 sh("docker login -u ${USERNAME} -p ${PASSWORD} ${DOCKER_REGISTRY}")
                 env.WERF_TAG_GIT_COMMIT = git_commit()
                 werf_run("build-and-publish --stages-storage :local --images-repo ${DOCKER_REGISTRY}/${HV}")
@@ -51,7 +53,7 @@ node ('mfominov') {
                 echo "no auto deploy for master branch"
             } else {
                 env.WERF_TAG_GIT_COMMIT = git_commit()
-                configFileProvider([configFile(fileId: 'hv-6-kubecfg', targetLocation: './kubecfg', variable: 'kube_cfg')]) {
+                configFileProvider([configFile(fileId: "${kubecfg_file_name}", targetLocation: './kubecfg', variable: 'kube_cfg')]) {
                     werf_run("deploy --env ${BRANCH} --stages-storage :local --images-repo ${DOCKER_REGISTRY}/${HV} --kube-config=${kube_cfg}")
                 }
             }
