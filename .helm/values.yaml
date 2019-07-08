@@ -1,3 +1,6 @@
+ci_url:
+  _default: "front-%s.hv-6-lm.flant.rus"
+
 replicas:
   api:
     stage: 2
