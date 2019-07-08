@@ -28,3 +28,15 @@ spec:
         - containerPort: {{ pluck .Values.global.env .Values.app.api.rest_port | first | default .Values.app.api.rest_port._default }}
           name: http
           protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Chart.Name }}
+spec:
+  clusterIP: None
+  selector:
+    component: {{ .Chart.Name }}
+  ports:
+  - name: http
+    port: {{ pluck .Values.global.env .Values.app.api.rest_port | first | default .Values.app.api.rest_port._default }}
