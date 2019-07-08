@@ -21,4 +21,4 @@ spec:
     spec:
       containers:
       - name: nginx
-{{ tuple "mfominov-project" . | include "werf_container_image" | indent 8 }}
+{{ tuple "frontend" . | include "werf_container_image" | indent 8 }}
