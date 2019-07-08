@@ -19,11 +19,11 @@ spec:
       labels:
         component: {{ .Chart.Name }}
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
       - name: frontend
 {{ tuple "frontend" . | include "werf_container_image" | indent 8 }}
-        imagePullSecrets:
-        - name: regcred
         ports:
         - containerPort: {{ pluck .Values.global.env .Values.app.api.rest_port | first | default .Values.app.api.rest_port._default }}
           name: http
