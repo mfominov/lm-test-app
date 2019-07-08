@@ -1,5 +1,5 @@
 ci_url:
-  _default: "front-%s.hv-6-lm.flant.rus"
+  _default: "front-%s.hv-6-lm.flant.ru"
 
 replicas:
   api:
