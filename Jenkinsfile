@@ -14,7 +14,10 @@ node ('mfominov') {
         checkout scm
     }
     stage('werf build') {
-        werf_run("build-and-publish --stages-storage :local --images-repo ${DOCKER_REGISTRY}/${HV} --tag-custom=1.0.0")
+        withCredentials([usernamePassword(credentialsId: 'DOCKER_REGISTRY', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+            sh("docker login -u ${USERNAME} -p ${PASSWORD} ${DOCKER_REGISTRY}")
+            werf_run("build-and-publish --stages-storage :local --images-repo ${DOCKER_REGISTRY}/${HV} --tag-custom=1.0.0")
+        }
     }
     // stage('werf_deploy') {
     //     werf_run("deploy --env dev --stages-storage :local --images-repo ${DOCKER_REGISTRY}/${HV} --tag-custom=1.0.0")
