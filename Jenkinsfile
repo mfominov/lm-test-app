@@ -51,7 +51,9 @@ node ('mfominov') {
                 echo "no auto deploy for master branch"
             } else {
                 env.WERF_TAG_GIT_COMMIT = git_commit()
-                werf_run("deploy --env ${BRANCH} --stages-storage :local --images-repo ${DOCKER_REGISTRY}/${HV}")
+                configFileProvider([configFile(fileId: 'hv-6-kubecfg', targetLocation: './kubecfg', variable: 'kube_cfg')]) {
+                    werf_run("deploy --env ${BRANCH} --stages-storage :local --images-repo ${DOCKER_REGISTRY}/${HV} --kube-config=${kube_cfg}")
+                }
             }
         }
     }
