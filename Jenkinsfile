@@ -47,7 +47,7 @@ node ('mfominov') {
         }
         stage('werf_deploy') {
             def BRANCH = git_branch()
-            if (BRANCH == "master") {
+            if ( BRANCH == "master" ) {
                 echo "no auto deploy for master branch"
             } else {
                 env.WERF_TAG_GIT_COMMIT = git_commit()
