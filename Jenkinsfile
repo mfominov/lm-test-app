@@ -48,6 +48,7 @@ node ('mfominov') {
                 }
             }
             stage('werf_deploy') {
+                env.DOCKER_CONFIG = "kubectl -n default get secrets regcred -o json |jq -r  '.data.\".dockerconfigjson\"'"
                 def BRANCH = git_branch()
                 if ( BRANCH == "master" ) {
                     echo "no auto deploy for master branch"
