@@ -35,25 +35,27 @@ def kubecfg_file_name = "hv-6-kubecfg"
 
 node ('mfominov') {
     timestamps {
-        deleteDir()
-        stage('repo checkout') {
-            checkout scm
-        }
-        stage('werf build') {
-            withCredentials([usernamePassword(credentialsId: "${DOCKER_REGISTRY_CREDENTIALS}", passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
-                sh("docker login -u ${USERNAME} -p ${PASSWORD} ${DOCKER_REGISTRY}")
-                env.WERF_TAG_GIT_COMMIT = git_commit()
-                werf_run("build-and-publish --stages-storage :local --images-repo ${DOCKER_REGISTRY}/${HV}")
+        ansiColor('xterm') {
+            deleteDir()
+            stage('repo checkout') {
+                checkout scm
             }
-        }
-        stage('werf_deploy') {
-            def BRANCH = git_branch()
-            if ( BRANCH == "master" ) {
-                echo "no auto deploy for master branch"
-            } else {
-                env.WERF_TAG_GIT_COMMIT = git_commit()
-                configFileProvider([configFile(fileId: "${kubecfg_file_name}", targetLocation: './kubecfg', variable: 'kube_cfg')]) {
-                    werf_run("deploy --env ${BRANCH} --stages-storage :local --images-repo ${DOCKER_REGISTRY}/${HV} --kube-config=${kube_cfg}")
+            stage('werf build') {
+                withCredentials([usernamePassword(credentialsId: "${DOCKER_REGISTRY_CREDENTIALS}", passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+                    sh("docker login -u ${USERNAME} -p ${PASSWORD} ${DOCKER_REGISTRY}")
+                    env.WERF_TAG_GIT_COMMIT = git_commit()
+                    werf_run("build-and-publish --stages-storage :local --images-repo ${DOCKER_REGISTRY}/${HV}")
+                }
+            }
+            stage('werf_deploy') {
+                def BRANCH = git_branch()
+                if ( BRANCH == "master" ) {
+                    echo "no auto deploy for master branch"
+                } else {
+                    env.WERF_TAG_GIT_COMMIT = git_commit()
+                    configFileProvider([configFile(fileId: "${kubecfg_file_name}", targetLocation: './kubecfg', variable: 'kube_cfg')]) {
+                        werf_run("deploy --env ${BRANCH} --stages-storage :local --images-repo ${DOCKER_REGISTRY}/${HV} --kube-config=${kube_cfg}")
+                    }
                 }
             }
         }
