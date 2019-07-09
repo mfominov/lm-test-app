@@ -7,7 +7,7 @@
     werf stages build --stages-storage :local
 ```
 
-2. Build
+2. Build &
 
 ```bash
     werf build-and-publish --stages-storage :local --images-repo nexus.lm-edu.flant.ru/hv6 --tag-custom=1.0.0
