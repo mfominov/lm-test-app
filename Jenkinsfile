@@ -48,14 +48,14 @@ node ('mfominov') {
                 }
             }
             stage('werf_deploy') {
-                env.DOCKER_CONFIG = "kubectl -n default get secrets regcred -o json |jq -r  '.data.\".dockerconfigjson\"'"
+                def REGISTRY_CONFIG = "kubectl -n default get secrets regcred -o json |jq -r  '.data.\".dockerconfigjson\"'"
                 def BRANCH = git_branch().toLowerCase().replaceAll('/','-')
                 if ( BRANCH == "master" ) {
                     echo "no auto deploy for master branch"
                 } else {
                     env.WERF_TAG_GIT_COMMIT = git_commit()
                     configFileProvider([configFile(fileId: "${kubecfg_file_name}", targetLocation: './kubecfg', variable: 'kube_cfg')]) {
-                        werf_run("deploy --env ${BRANCH} --stages-storage :local --images-repo ${DOCKER_REGISTRY}/${HV} --kube-config=${kube_cfg}")
+                        werf_run("deploy --env ${BRANCH} --stages-storage :local --images-repo ${DOCKER_REGISTRY}/${HV} --kube-config=${kube_cfg} --set=global.registryConfig=${REGISTRY_CONFIG}")
                     }
                 }
             }
